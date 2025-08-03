@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="title"><h1>Calcify</h1></div>
+    <div id="main">
+            <div class="border">
+                <input class="screen itemScreen" id="screen" type="text" name="screen"   >
+                <div class="buttons">
+                <button class="nums itemAC" type="button" value="AC" onclick="document.getElementById('screen').value = ''">AC</button>
+                <button class="nums itemB" id="backspace" type="button">⌫</button>
+                <button class="nums itemDivide" type="button" value="/" onclick="div()">/</button>
+                <button class="nums itemTimes" type="button" value="x" onclick="mul()">x</button>
+                <button class="nums item7" type="button" value="7" onclick="document.getElementById('screen').value += 7">7</button>
+                <button class="nums item8" type="button" value="8" onclick="document.getElementById('screen').value += 8">8</button>
+                <button class="nums item9" type="button" value="9" onclick="document.getElementById('screen').value += 9">9</button>
+                <button class="nums item4" type="button" value="4" onclick="document.getElementById('screen').value += 4">4</button>
+                <button class="nums item5" type="button" value="5" onclick="document.getElementById('screen').value += 5">5</button>
+                <button class="nums item6" type="button" value="6" onclick="document.getElementById('screen').value += 6">6</button>
+                <button class="nums itemMinus" type="button" value="-" onclick="sub()">-</button>
+                <button class="nums item1" type="button" value="1" onclick="document.getElementById('screen').value +=1 ">1</button>
+                <button class="nums item2" type="button" value="2" onclick="document.getElementById('screen').value +=2 ">2</button>
+                <button class="nums item3" type="button" value="3" onclick="document.getElementById('screen').value +=3 ">3</button>
+                <button class="nums itemPlus" type="button" value="+" onclick="add()">+</button>
+                <button class="nums item0" type="button" value="0" onclick="document.getElementById('screen').value +=0 ">0</button>
+                <button class="nums itemDot" type="button" value="." onclick="document.getElementById('screen').value += '.'">.</button>
+                <button class="nums itemEquals" type="button" value="=" onclick="document.getElementById('screen').value = eval(document.getElementById('screen').value)">=</button>
+                </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
