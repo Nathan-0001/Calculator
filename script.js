@@ -4,13 +4,17 @@ const buttons = document.querySelector('.buttons');
 const state = {
     currentOperand: '',
     expression: [],
-    justEvaluated: false
+    justEvaluated: false,
+    lastOperand: null,
+    lastOperator: null
 };
 
 function resetState() {
     state.currentOperand = '';
     state.expression = [];
     state.justEvaluated = false;
+    state.lastOperand = null;
+    state.lastOperator = null;
 }
 
 function formatNumber(n) {
@@ -34,7 +38,7 @@ function formatExpression() {
     for (const t of state.expression) {
         parts.push(typeof t === 'number' ? formatNumber(t) : opSymbol(t));
     }
-    if (state.currentOperand !== '') {
+    if (state.currentOperand !== '' && (!state.justEvaluated || parts.length === 0)) {
         parts.push(state.currentOperand);
     }
     return parts.join(' ') || '0';
@@ -42,6 +46,10 @@ function formatExpression() {
 
 function updateDisplay() {
     screen.value = formatExpression();
+}
+
+function isValidNumber(str) {
+    return str !== '' && str !== '-' && str !== '.' && str !== '-.' && !isNaN(parseFloat(str));
 }
 
 function evaluatePEMDAS(tokens) {
@@ -86,21 +94,34 @@ function handleDigit(d) {
     if (state.currentOperand === '0' && d !== '.') {
         state.currentOperand = d;
     } else {
+        if (state.currentOperand.length >= 16) return;
         state.currentOperand += d;
     }
-    if (state.currentOperand.length > 16) return;
     updateDisplay();
 }
 
+function commitOperand() {
+    if (isValidNumber(state.currentOperand)) {
+        const num = parseFloat(state.currentOperand);
+        state.expression.push(num);
+        state.currentOperand = '';
+        return true;
+    }
+    return false;
+}
+
 function handleOperator(op) {
+    if (state.currentOperand === 'Error') {
+        resetState();
+    }
     if (state.justEvaluated) {
-        state.expression = [parseFloat(state.currentOperand)];
+        state.lastOperand = parseFloat(state.currentOperand);
+        state.expression = [state.lastOperand];
         state.currentOperand = '';
         state.justEvaluated = false;
     }
     if (state.currentOperand !== '') {
-        state.expression.push(parseFloat(state.currentOperand));
-        state.currentOperand = '';
+        commitOperand();
     }
     if (state.expression.length === 0) {
         if (op === '-') {
@@ -124,16 +145,46 @@ function handleOperator(op) {
     updateDisplay();
 }
 
+function captureLastOp() {
+    if (state.expression.length >= 3) {
+        const opIdx = state.expression.length - 2;
+        if (typeof state.expression[opIdx] === 'string') {
+            state.lastOperator = state.expression[opIdx];
+            state.lastOperand = state.expression[opIdx + 1];
+            return true;
+        }
+    }
+    return false;
+}
+
 function handleEquals() {
-    if (state.justEvaluated) return;
-    if (state.currentOperand !== '') {
-        state.expression.push(parseFloat(state.currentOperand));
-        state.currentOperand = '';
+    if (state.justEvaluated) {
+        if (state.lastOperand !== null && state.lastOperator !== null) {
+            const curr = parseFloat(state.currentOperand);
+            state.expression = [curr, state.lastOperator, state.lastOperand];
+            const result = evaluatePEMDAS([...state.expression]);
+            if (!isFinite(result)) {
+                state.currentOperand = 'Error';
+                state.expression = [];
+                state.justEvaluated = true;
+                updateDisplay();
+                return;
+            }
+            state.currentOperand = displayNumber(result);
+            state.expression = [result];
+            updateDisplay();
+        }
+        return;
+    }
+    const hasOperand = isValidNumber(state.currentOperand);
+    if (hasOperand) {
+        commitOperand();
     }
     if (state.expression.length < 3) return;
     if (typeof state.expression[state.expression.length - 1] === 'string') {
         state.expression.pop();
     }
+    captureLastOp();
     const result = evaluatePEMDAS([...state.expression]);
     if (!isFinite(result)) {
         state.currentOperand = 'Error';
@@ -194,6 +245,7 @@ buttons.addEventListener('click', (e) => {
 });
 
 document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey) return;
     if (e.key >= '0' && e.key <= '9') {
         handleDigit(e.key);
         return;

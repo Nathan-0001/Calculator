@@ -162,9 +162,10 @@ body {
     color: var(--button-text);
     font-weight: 700;
     font-size: 1.4rem;
-    grid-row: 4 / span 2;
     grid-column: 4;
-    height: auto;
+    grid-row: 4 / span 2;
+    height: 100%;
+    min-height: unset;
 }
 .itemEquals:hover {
     background: var(--equals-hover);
@@ -206,6 +207,9 @@ body {
         height: 44px;
         font-size: 1rem;
     }
+    .itemEquals {
+        height: 100%;
+    }
     .itemScreen {
         height: 52px;
         font-size: 1.5rem;
@@ -215,7 +219,7 @@ body {
     }
 }
 
-/* ---- Responsive: taller screens, tighten spacing ---- */
+/* ---- Responsive: taller screens ---- */
 @media (min-width: 600px) {
     .border {
         width: 360px;
@@ -227,6 +231,9 @@ body {
     .nums {
         height: 58px;
         font-size: 1.3rem;
+    }
+    .itemEquals {
+        height: 100%;
     }
     .itemScreen {
         height: 70px;
